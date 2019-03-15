@@ -18,7 +18,7 @@ class LocationDaoImpl @Inject()(dbConfigProvider: DatabaseConfigProvider)(implic
   import dbConfig._
 
   class LocationTable(tag: Tag) extends Table[Location](tag, "locations") {
-    def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
+    def id = column[Long]("locationid", O.PrimaryKey, O.AutoInc)
 
     def latitude = column[Double]("latitude")
 
@@ -27,6 +27,7 @@ class LocationDaoImpl @Inject()(dbConfigProvider: DatabaseConfigProvider)(implic
     override def * = (id, latitude, longitude) <> (Location.tupled, Location.unapply)
 
   }
+
 
   implicit val locations: TableQuery[LocationTable] = TableQuery[LocationTable]
 

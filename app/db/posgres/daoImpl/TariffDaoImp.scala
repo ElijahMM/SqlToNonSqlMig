@@ -21,7 +21,7 @@ class TariffDaoImp @Inject()(dbConfigProvider: DatabaseConfigProvider)(implicit 
   import dbConfig._
 
   class TariffTable(tag: Tag) extends Table[Tariff](tag, "tariffs") {
-    def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
+    def id = column[Long]("tariffid", O.PrimaryKey, O.AutoInc)
 
     def price = column[Long]("price")
 

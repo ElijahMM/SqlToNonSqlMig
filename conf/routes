@@ -6,9 +6,9 @@
 # An example controller showing a sample home page
 GET        /                    controllers.HomeController.index
 +external
-GET        /get                 controllers.HomeController.get
+GET        /getAll              controllers.HomeController.getAll
+GET        /get                 controllers.HomeController.get(id:Option[Long])
+GET        /save                controllers.HomeController.saveCity
 
 # Map static resources from the /public folder to the /assets URL path
 GET        /assets/*file        controllers.Assets.versioned(path="/public", file: Asset)
-
-      
