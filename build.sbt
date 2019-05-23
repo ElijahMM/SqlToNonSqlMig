@@ -19,7 +19,8 @@ libraryDependencies ++= Seq(ehcache, ws, specs2 % Test, guice,
   "com.h2database" % "h2" % "1.4.197",
   "org.webjars" %% "webjars-play" % "2.6.3",
   "org.webjars" % "bootstrap" % "3.1.1-2",
-  "com.typesafe.akka" %% "akka-actor" % "2.5.21"
+  "com.typesafe.akka" %% "akka-actor" % "2.5.21",
+  "com.github.mongobee" % "mongobee" % "0.13"
 )
 
 //conflict between ch.qos.logback and org.slf4j -- multiple bindings--

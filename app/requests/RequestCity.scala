@@ -1,10 +1,9 @@
 package requests
 
-import play.api.data.Form
-import play.api.data.Forms._
-import play.api.data.format.Formats._
+import db.posgres.models.{City, Location, Tariff}
 
 case class RequestCity(
+                        id: Option[Long],
                         name: String,
                         country: String,
                         location: RequestLocation,
@@ -13,17 +12,9 @@ case class RequestCity(
 
 object RequestCity {
 
-  val requestCityForm = Form(
-    mapping(
-      "name" -> text,
-      "country" -> text,
-      "location" -> mapping(
-        "latitude" -> of(doubleFormat),
-        "longitude" -> of(doubleFormat)
-      )(RequestLocation.apply)(RequestLocation.unapply),
-      "tariff" -> mapping(
-        "price" -> longNumber,
-        "currency" -> text
-      )(RequestTariff.apply)(RequestTariff.unapply)
-    )(RequestCity.apply)(RequestCity.unapply))
+  def apply(city: City, Location: Location, tariff: Tariff): RequestCity =
+    RequestCity(Some(city.id), city.name, city.country,
+      RequestLocation(Location.longitude, Location.longitude),
+      RequestTariff(tariff.price, tariff.currency))
+  
 }

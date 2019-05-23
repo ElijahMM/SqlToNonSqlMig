@@ -1,13 +1,12 @@
 package db.posgres.daoImpl
 
 import db.posgres.dao.CityDao
-import db.posgres.models.{City, Tariff, Location}
+import db.posgres.models.{City, Location, Tariff}
 import javax.inject.Inject
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 import slick.jdbc.PostgresProfile.api._
 import slick.lifted.Tag
-import slick.jdbc.PostgresProfile.backend._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -53,6 +52,10 @@ class CityDaoImpl @Inject()(dbConfigProvider: DatabaseConfigProvider, val locati
 
   override def delete(id: Long): Future[Int] = {
     db.run(cities.filter(_.id === id).delete)
+  }
+
+  override def getCount: Future[Int] = {
+    db.run(cities.length.result)
   }
 
   override def getAll: Future[Seq[(City, Location, Tariff)]] = {

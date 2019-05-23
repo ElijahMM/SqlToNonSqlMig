@@ -7,13 +7,12 @@ import org.mongodb.scala.MongoClient
 @Singleton
 class MongoDatabaseConfig {
 
-  private def client(): MongoClient = {
-    val hostName = ConfigFactory.load().getString("mongo.host")
-    MongoClient(s"mongodb://$hostName:27017")
+  def client(): MongoClient = {
+    MongoClient(s"mongodb://dev_root:toors@localhost:27017/thingpark_hub")
   }
 
-  private def getDatabase(name: String = ConfigFactory.load().getString("mongo.dbName")) = client().getDatabase(name)
 
-  def getCollection(name: String) = getDatabase().getCollection(name)
+  def getCollection(name: String) = client().getDatabase("thingpark_hub").getCollection(name)
+
 }
 

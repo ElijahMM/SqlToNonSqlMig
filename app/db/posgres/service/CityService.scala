@@ -1,7 +1,6 @@
 package db.posgres.service
 
 import com.google.inject.ImplementedBy
-import db.posgres.models.{City, Location, Tariff}
 import requests.RequestCity
 
 import scala.concurrent.Future
@@ -16,5 +15,7 @@ trait CityService {
 
   def getAllCities: Future[Seq[RequestCity]]
 
-  def getBatchCities(batchSize: Int): Future[Seq[RequestCity]]
+  def getCount: Future[Int]
+
+  def getBatchCities(batchNumber: Int, batchSize: Int): Future[Seq[RequestCity]]
 }

@@ -8,6 +8,7 @@ object DBModelToMongoDoc {
   def convert(requestCity: RequestCity): Document = {
     Document(
       "tariff" -> Document(
+        "_id" ->requestCity.id.get,
         "city" -> Document(
           "name" -> requestCity.name,
           "country" -> requestCity.country,

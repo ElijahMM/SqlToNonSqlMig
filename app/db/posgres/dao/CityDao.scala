@@ -2,7 +2,7 @@ package db.posgres.dao
 
 import com.google.inject.ImplementedBy
 import db.posgres.daoImpl.CityDaoImpl
-import db.posgres.models.{City, Tariff, Location}
+import db.posgres.models.{City, Location, Tariff}
 
 import scala.concurrent.Future
 
@@ -15,6 +15,8 @@ trait CityDao {
   def delete(id: Long): Future[Int]
 
   def getAll: Future[Seq[(City, Location, Tariff)]]
+
+  def getCount: Future[Int]
 
   def getWithOffset(batchNumber: Int, batchSize: Int): Future[Seq[(City, Location, Tariff)]]
 }

@@ -1,10 +1,16 @@
 package controllers
 
+import actors.Trigger
+import db.DBModelToMongoDoc
 import db.mongo.MongoDatabaseConfig
+import db.posgres.models.Location
 import db.posgres.service.CityService
-import javax.inject._
+import helpers.ProcessingQueue
+import javax.inject.{Inject, Singleton}
+import org.mongodb.scala.MongoClient
+import org.mongodb.scala.bson.{BsonDocument, BsonInt32}
 import play.api.mvc._
-import requests.RequestCity
+import requests.{RequestCity, RequestLocation, RequestTariff}
 
 import scala.concurrent.ExecutionContext
 
@@ -13,7 +19,7 @@ import scala.concurrent.ExecutionContext
   * application's home page.
   */
 @Singleton
-class HomeController @Inject()(cc: ControllerComponents, cityService: CityService, mongoDatabaseConfig: MongoDatabaseConfig)(implicit ec: ExecutionContext) extends AbstractController(cc) with play.api.i18n.I18nSupport {
+class HomeController @Inject()(cc: ControllerComponents, cityService: CityService, mongoDatabaseConfig: MongoDatabaseConfig, trigger: Trigger)(implicit ec: ExecutionContext) extends AbstractController(cc) with play.api.i18n.I18nSupport {
 
   /**
     * Create an Action to render an HTML page with a welcome message.
@@ -22,15 +28,19 @@ class HomeController @Inject()(cc: ControllerComponents, cityService: CityServic
     * a path of `/`.
     */
   def index = Action { implicit request =>
-    Ok(views.html.city(RequestCity.requestCityForm))
+    Ok("App is ready")
   }
 
-  def saveCity = Action(parse.form(RequestCity.requestCityForm)) { implicit request =>
-    val requestCityData = request.body
-
-    for (_ <- 1 to 10000)
-      cityService.addCity(requestCityData)
-
+  def saveCity = Action { implicit request =>
+    val requestCityData = RequestCity(Some(1),
+      "Suceava",
+      "Romania",
+      RequestLocation(111.3, 111.1),
+      RequestTariff(1000, "$")
+    )
+    val y = DBModelToMongoDoc.convert(requestCityData)
+    val client = MongoClient(s"mongodb://localhost:27017")
+    client.getDatabase("aaaaaa").getCollection("data").insertOne(y)
     Ok("")
   }
 
@@ -48,12 +58,20 @@ class HomeController @Inject()(cc: ControllerComponents, cityService: CityServic
     )
   }
 
-  def getAll() = Action.async {
-    val result = cityService.getAllCities
-    result.map(i =>
-      Ok("Got result: " + i)
+  def getAll() = Action {
+    val collection = mongoDatabaseConfig.getCollection("mongoTest")
+    val document: BsonDocument = new BsonDocument("_id", new BsonInt32(2)).append("x", new BsonInt32(1))
+    collection.insertOne(document)
+    Ok(views.html.index("Your new application is ready."))
+  }
 
-    )
+  def startProcessing = Action {
+    val processingQueue = new ProcessingQueue
+    cityService.getCount map { rez =>
+      processingQueue.totalNumber = rez
+      trigger.startProcessing(processingQueue)
+    }
+    Ok("1")
   }
 
 }

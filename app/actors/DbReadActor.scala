@@ -1,23 +1,22 @@
 package actors
 
 
-import actors.Notifiers.{GetData, SendData}
-import akka.actor.{Actor, ActorLogging, Props}
-import db.posgres.service.CityService
+import akka.actor.Actor
+import helpers.Notifiers.{GotData, ReadData}
+import stages.ReadStage
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
 
-class DbReadActor (cityService: CityService, batchSize: Int) extends Actor with ActorLogging {
 
-  override def preStart(): Unit = log.info("DbReadActor started")
-
-  override def postStop(): Unit = log.info("DbReadActor stopped")
+class DbReadActor(readStage: ReadStage) extends Actor {
 
   override def receive: Receive = {
-    case GetData =>
-//      cityService.getBatchCities(batchSize).map {
-//        rez => sender() ! SendData(rez)
-//      }
+    case ReadData(processingQueue) => {
+      val result = readStage.execute(processingQueue)
+      Await.result(result, Duration.Inf)
+      sender() ! GotData(processingQueue)
+    }
   }
 
 }

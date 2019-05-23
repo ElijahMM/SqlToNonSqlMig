@@ -4,11 +4,12 @@
 # ~~~~
 
 # An example controller showing a sample home page
-GET        /                    controllers.HomeController.index
+GET        /                       controllers.HomeController.index
 +external
-GET        /getAll              controllers.HomeController.getAll
-GET        /get                 controllers.HomeController.get(id:Option[Long])
-GET        /save                controllers.HomeController.saveCity
+GET        /getAll                 controllers.HomeController.getAll
+GET        /get                    controllers.HomeController.get(id:Option[Long])
+GET        /save                   controllers.HomeController.saveCity
+GET        /startProcessing        controllers.HomeController.startProcessing
 
 # Map static resources from the /public folder to the /assets URL path
-GET        /assets/*file        controllers.Assets.versioned(path="/public", file: Asset)
+GET        /assets/*file           controllers.Assets.versioned(path="/public", file: Asset)

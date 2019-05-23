@@ -1,23 +1,25 @@
 package actors
 
-import akka.actor.{Actor, ActorLogging, Props}
-import akka.routing.FromConfig
-import db.posgres.service.CityService
-import javax.inject.Inject
-import org.apache.commons.lang3.exception.ExceptionContext
+import akka.actor.{Actor, ActorRef, Props}
+import akka.util.Timeout
+import helpers.Notifiers._
+import stages.{ReadStage, WriteStage}
 
+import scala.concurrent.ExecutionContext
+import scala.concurrent.duration._
 
-class OperationSupervisor @Inject()(cityService: CityService, batchSize: Int) extends Actor with ActorLogging {
+class OperationSupervisor(writeStage: WriteStage, readStage: ReadStage) extends Actor {
 
-  private val mongoRouter = context.actorOf(FromConfig.props(Props(classOf[MongoWriteActor])), "mongoRouter")
+  private val mongoActor: ActorRef = context.actorOf(Props(classOf[MongoWriteActor], writeStage))
 
-  private val postgressRouter = context.actorOf(FromConfig.props(Props(classOf[DbReadActor], cityService, batchSize)), "postgressRouter")
+  private val postgresActor: ActorRef = context.actorOf(Props(classOf[DbReadActor], readStage))
 
-  override def preStart(): Unit = log.info("OperationSupervisor Application started")
+  implicit val timeout: Timeout = Timeout(10 seconds)
+  implicit val ec: ExecutionContext = ExecutionContext.global
 
-  override def postStop(): Unit = log.info("OperationSupervisor Application stopped")
-
-  // No need to handle any messages
-  override def receive = Actor.emptyBehavior
-
+  override def receive: PartialFunction[Any, Unit] = {
+    case ReadData(queue) => postgresActor ! ReadData(queue)
+    case GotData(queue) => mongoActor ! WriteData(queue)
+    case DoneProcessing(queue) => mongoActor ! Log(queue)
+  }
 }
